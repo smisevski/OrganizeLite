@@ -1,0 +1,20 @@
+@import '../../node_modules/vuetify/src/stylus/bootstrap'
+@import '../../node_modules/vuetify/src/stylus/theme'
+
+/* Theme */
+fixed-pagination($material)
+    .v-data-iterator
+        height 100vh
+        position relative
+
+    div .v-data-iterator__actions
+        position fixed
+        bottom 1px
+        right 3px
+
+    div .v-data-iterator__actions__select
+            display none
+            flex-wrap nowrap
+            white-space nowrap
+
+theme(fixed-pagination, 'fixed-pagination')
