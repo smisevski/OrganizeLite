@@ -56,7 +56,10 @@
                         lg2
                         xl2
                         >
-                        <v-card>
+                        <v-card
+                        @click.native="productDialog = true"
+                        :hover="true"
+                        >
                             <v-card-title>
                                 <h6
                                 style="overflow: hidden; position:absolute;"
@@ -73,6 +76,30 @@
                                 <v-list-tile-content class="align-end">{{ props.item.product_unitprice }}</v-list-tile-content>
                             </v-list-tile>
                             </v-list>
+                            <v-card-actions style="text-align: center">
+                                <v-layout row align-content-center>
+                                    <v-flex md12>
+                                        <v-btn 
+                                        icon
+                                        @click="AddProductToFavorites"
+                                        >
+                                            <v-icon color="yellow darken-3">star</v-icon>
+                                        </v-btn>
+                                        <v-btn 
+                                        icon
+                                        @click="AddProductToCategory"
+                                        >
+                                            <v-icon color="blue darken-3">category</v-icon>
+                                        </v-btn>
+                                        <v-btn 
+                                        icon
+                                        @click="AddToSelectedInvoice"
+                                        >
+                                            <v-icon color="green darken-3">all_inclusive</v-icon>
+                                        </v-btn>
+                                    </v-flex>
+                                </v-layout>
+                            </v-card-actions>
                         </v-card>
                         </v-flex>
                     </template>
@@ -88,7 +115,6 @@
     >
       <v-card>
         <v-card-title class="headline">Manage categories</v-card-title>
-
         <v-card-text>
             <v-text-field
             label="Category name"
@@ -96,7 +122,6 @@
             >
             </v-text-field>
         </v-card-text>
-
         <v-card-actions>
             <v-spacer></v-spacer>
           <v-btn
@@ -106,7 +131,35 @@
           >
             Cancel
           </v-btn>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="AddCategory"
+          >
+            Add
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- Add product to invoice/category dialog  -->
+    <v-dialog
+      v-model="productDialog"
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="headline">Add product</v-card-title>
+        <v-card-text>
 
+        </v-card-text>
+        <v-card-actions>
+            <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="productDialog = false"
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="blue darken-3"
             flat="flat"
@@ -138,7 +191,7 @@ export default {
             products: [],
             rowsPerPageItems: [4, 8, 12],
             pagination: {
-                rowsPerPage: 18
+                rowsPerPage: 12
             },
             headers: [
                 {
@@ -184,6 +237,7 @@ export default {
                 {title: 'Add category'}
             ],
             dialog: false,
+            productDialog: false,
             addCategoryName: ''
         }
     },

@@ -2674,6 +2674,59 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
@@ -2689,7 +2742,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
       products: [],
       rowsPerPageItems: [4, 8, 12],
       pagination: {
-        rowsPerPage: 18
+        rowsPerPage: 12
       },
       headers: [{
         text: 'Product code',
@@ -2730,6 +2783,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
         title: 'Add category'
       }],
       dialog: false,
+      productDialog: false,
       addCategoryName: ''
     };
   },
@@ -39914,6 +39968,14 @@ var render = function() {
                               [
                                 _c(
                                   "v-card",
+                                  {
+                                    attrs: { hover: true },
+                                    nativeOn: {
+                                      click: function($event) {
+                                        _vm.productDialog = true
+                                      }
+                                    }
+                                  },
                                   [
                                     _c("v-card-title", [
                                       _c(
@@ -39979,6 +40041,105 @@ var render = function() {
                                                   )
                                                 )
                                               ]
+                                            )
+                                          ],
+                                          1
+                                        )
+                                      ],
+                                      1
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "v-card-actions",
+                                      {
+                                        staticStyle: { "text-align": "center" }
+                                      },
+                                      [
+                                        _c(
+                                          "v-layout",
+                                          {
+                                            attrs: {
+                                              row: "",
+                                              "align-content-center": ""
+                                            }
+                                          },
+                                          [
+                                            _c(
+                                              "v-flex",
+                                              { attrs: { md12: "" } },
+                                              [
+                                                _c(
+                                                  "v-btn",
+                                                  {
+                                                    attrs: { icon: "" },
+                                                    on: {
+                                                      click:
+                                                        _vm.AddProductToFavorites
+                                                    }
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "v-icon",
+                                                      {
+                                                        attrs: {
+                                                          color:
+                                                            "yellow darken-3"
+                                                        }
+                                                      },
+                                                      [_vm._v("star")]
+                                                    )
+                                                  ],
+                                                  1
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "v-btn",
+                                                  {
+                                                    attrs: { icon: "" },
+                                                    on: {
+                                                      click:
+                                                        _vm.AddProductToCategory
+                                                    }
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "v-icon",
+                                                      {
+                                                        attrs: {
+                                                          color: "blue darken-3"
+                                                        }
+                                                      },
+                                                      [_vm._v("category")]
+                                                    )
+                                                  ],
+                                                  1
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "v-btn",
+                                                  {
+                                                    attrs: { icon: "" },
+                                                    on: {
+                                                      click:
+                                                        _vm.AddToSelectedInvoice
+                                                    }
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "v-icon",
+                                                      {
+                                                        attrs: {
+                                                          color:
+                                                            "green darken-3"
+                                                        }
+                                                      },
+                                                      [_vm._v("all_inclusive")]
+                                                    )
+                                                  ],
+                                                  1
+                                                )
+                                              ],
+                                              1
                                             )
                                           ],
                                           1
@@ -40056,6 +40217,64 @@ var render = function() {
                       on: {
                         click: function($event) {
                           _vm.dialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Cancel\n      ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: { click: _vm.AddCategory }
+                    },
+                    [_vm._v("\n        Add\n      ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "290" },
+          model: {
+            value: _vm.productDialog,
+            callback: function($$v) {
+              _vm.productDialog = $$v
+            },
+            expression: "productDialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", { staticClass: "headline" }, [
+                _vm._v("Add product")
+              ]),
+              _vm._v(" "),
+              _c("v-card-text"),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          _vm.productDialog = false
                         }
                       }
                     },
