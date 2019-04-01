@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CategorisedProducts extends Model
 {
-    protected $table = 'vw_products_by_categories';
-    protected $primaryKey = "products_id";
+    protected $table = 'products_categorised';
+    protected $primaryKey = "products_categorised_id";
+    public $timestamps = false;
 }

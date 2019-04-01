@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Products;
 use App\Category;
 use App\CategorisedProducts;
+use App\ProductsByCategory;
 
 class ProductsController extends Controller
 {
@@ -24,7 +25,7 @@ class ProductsController extends Controller
         }
         else
         {
-            $products = CategorisedProducts::where($request->data['field'], $request->data['operator'], $request->data['value'])->get();
+            $products = ProductsByCategory::where($request->data['field'], $request->data['operator'], $request->data['value'])->get();
             return $products;
         }
     }

@@ -57,7 +57,6 @@
                         xl2
                         >
                         <v-card
-                        @click.native="productDialog = true"
                         :hover="true"
                         >
                             <v-card-title>
@@ -81,19 +80,18 @@
                                     <v-flex md12>
                                         <v-btn 
                                         icon
-                                        @click="AddProductToFavorites"
+                                        @click="AddProductToCategory(props.item.product_id, 2)"
                                         >
                                             <v-icon color="yellow darken-3">star</v-icon>
                                         </v-btn>
                                         <v-btn 
                                         icon
-                                        @click="AddProductToCategory"
+                                        @click="dialog = true"
                                         >
                                             <v-icon color="blue darken-3">category</v-icon>
                                         </v-btn>
                                         <v-btn 
                                         icon
-                                        @click="AddToSelectedInvoice"
                                         >
                                             <v-icon color="green darken-3">all_inclusive</v-icon>
                                         </v-btn>
@@ -108,7 +106,7 @@
             </v-layout>
         </v-container>
 
-    <!-- Add Category Name Dialog    -->
+    <!-- Manage Category Name Dialog    -->
     <v-dialog
       v-model="dialog"
       max-width="290"
@@ -321,10 +319,15 @@ export default {
             ).then(res => {
                 this.dialog = false;
                 this.GetCategories();
+                this.GetAllProducts();
             }).catch(err => {
                 console.error(err);
             }); 
         }
+    },
+    AddToSelectedInvoice()
+    {
+
     },
     created(){
         this.GetAllProducts();

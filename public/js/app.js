@@ -2725,8 +2725,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
@@ -2862,11 +2860,14 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
         _this5.dialog = false;
 
         _this5.GetCategories();
+
+        _this5.GetAllProducts();
       }).catch(function (err) {
         console.error(err);
       });
     }
   },
+  AddToSelectedInvoice: function AddToSelectedInvoice() {},
   created: function created() {
     this.GetAllProducts();
     this.GetCategories();
@@ -39968,14 +39969,7 @@ var render = function() {
                               [
                                 _c(
                                   "v-card",
-                                  {
-                                    attrs: { hover: true },
-                                    nativeOn: {
-                                      click: function($event) {
-                                        _vm.productDialog = true
-                                      }
-                                    }
-                                  },
+                                  { attrs: { hover: true } },
                                   [
                                     _c("v-card-title", [
                                       _c(
@@ -40073,8 +40067,12 @@ var render = function() {
                                                   {
                                                     attrs: { icon: "" },
                                                     on: {
-                                                      click:
-                                                        _vm.AddProductToFavorites
+                                                      click: function($event) {
+                                                        return _vm.AddProductToCategory(
+                                                          props.item.product_id,
+                                                          2
+                                                        )
+                                                      }
                                                     }
                                                   },
                                                   [
@@ -40097,8 +40095,9 @@ var render = function() {
                                                   {
                                                     attrs: { icon: "" },
                                                     on: {
-                                                      click:
-                                                        _vm.AddProductToCategory
+                                                      click: function($event) {
+                                                        _vm.dialog = true
+                                                      }
                                                     }
                                                   },
                                                   [
@@ -40117,13 +40116,7 @@ var render = function() {
                                                 _vm._v(" "),
                                                 _c(
                                                   "v-btn",
-                                                  {
-                                                    attrs: { icon: "" },
-                                                    on: {
-                                                      click:
-                                                        _vm.AddToSelectedInvoice
-                                                    }
-                                                  },
+                                                  { attrs: { icon: "" } },
                                                   [
                                                     _c(
                                                       "v-icon",
