@@ -37,6 +37,10 @@ Route::post('/addcategory', 'ProductsController@AddCategory');
 
 Route::post('/addtocategory', 'ProductsController@AddProductToCategory');
 
+Route::delete('/removecategory', 'ProductsController@RemoveCategory');
+
+Route::delete('/removefromcategory', 'ProductsController@RemoveFromCategory');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');

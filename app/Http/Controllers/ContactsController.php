@@ -22,37 +22,33 @@ class ContactsController extends Controller
     public function UpdateContact(Request $request)
     {
         $updateContact = Contact::where('contact_id', '=',$request->data['contact_id']);
-        $updateContact->contact_firstname = $request->data['contact_firstname'];
-        $updateContact->contact_lastname = $request->data['contact_lastname'];
-        $updateContact->contact_gender = $request->data['contact_gender'];
-        $updateContact->contact_birthdate = $request->data['contact_birthdate'];
-        $updateContact->contact_phone = $request->data['contact_phone'];
-        $updateContact->contact_mobile = $request->data['contact_mobile'];
-        $updateContact->contact_fax = $request->data['contact_fax'];
-        $updateContact->contact_email = $request->data['contact_email'];
-        $updateContact->contact_status = 'active';
-        
+        $updateContact->update(['contact_id' => $request->data['contact_id']]);
+        $updateContact->update(['contact_firstname' => $request->data['contact_firstname']]);
+        $updateContact->update(['contact_lastname' => $request->data['contact_lastname']]);
+        $updateContact->update(['contact_gender' => $request->data['contact_gender']]);
+        $updateContact->update(['contact_birthdate' => $request->data['contact_birthdate']]);
+        $updateContact->update(['contact_phone' => $request->data['contact_phone']]);
+        $updateContact->update(['contact_mobile' => $request->data['contact_mobile']]);
+        $updateContact->update(['contact_fax' => $request->data['contact_fax']]);
+        $updateContact->update(['contact_email' => $request->data['contact_email']]);
+        $updateContact->update(['contact_status' => 'active']);  
         // $contact->contact_idcard = $request->data['contact_idcard'];
         
         $updateContactAddress = ContactAdresses::where('contact_id', '=',$request->data['contact_id']);
-        $updateContactAddress->street = $request->data['contact_street'];
-        $updateContactAddress->city = $request->data['contact_city'];
-        $updateContactAddress->province = $request->data['contact_province'];
-        $updateContactAddress->country = $request->data['contact_country'];
-        $updateContactAddress->zip_code = $request->data['contact_zip_code'];
+        $updateContactAddress->update(['street' => $request->data['contact_street']]);
+        $updateContactAddress->update(['city' => $request->data['contact_city']]);
+        $updateContactAddress->update(['province' => $request->data['contact_province']]);
+        $updateContactAddress->update(['country' => $request->data['contact_country']]);
+        $updateContactAddress->update(['zip_code' => $request->data['contact_zip_code']]);
 
-        $updateContactCompany = ContactCompany::where('contact_id', '=',$request->data['contact_id']);
-        $updateContactCompany->contact_company_name = $request->data['contact_company_name'];
-        $updateContactCompany->contact_company_address = $request->data['contact_company_address'];
-        $updateContactCompany->contact_company_email = $request->data['contact_company_email'];
-        $updateContactCompany->contact_company_phone = $request->data['contact_company_phone'];
-        $updateContactCompany->contact_company_fax = $request->data['contact_company_fax'];
-        $updateContactCompany->contact_company_fiscalcode = $request->data['contact_company_fiscalcode'];
-        $updateContactCompany->contact_company_position = $request->data['contact_company_position'];
-
-        $updateContact->update(['contact_id' => $request->data['contact_id']]);
-        $updateContactAddress->update(['contact_id' => $request->data['contact_id']]);
-        $updateContactCompany->update(['contact_id' => $request->data['contact_id']]);
+        $updateContactCompany = ContactCompany::where('contact_id', '=',$request->data['contact_id']); 
+        $updateContactAddress->update(['contact_company_name' => $request->data['contact_company_name']]);
+        $updateContactCompany->update(['contact_company_address' => $request->data['contact_company_address']]);
+        $updateContactCompany->update(['contact_company_email' => $request->data['contact_company_email']]);
+        $updateContactCompany->update(['contact_company_phone' => $request->data['contact_company_phone']]);
+        $updateContactCompany->update(['contact_company_fax' => $request->data['contact_company_fax']]);
+        $updateContactCompany->update(['contact_company_fiscalcode' => $request->data['contact_company_fiscalcode']]);
+        $updateContactCompany->update(['contact_company_position' => $request->data['contact_company_position']]);
     }
 
     public function SaveContact(Request $request)

@@ -8,12 +8,13 @@
                 <v-toolbar    
                 light>
 
-                    <v-toolbar-title>
+                    <v-toolbar-title class="title">
                         <v-icon>group</v-icon>
+                        Clients
                     </v-toolbar-title>
 
                     <v-spacer></v-spacer>
-                    <v-icon color="blue darken-3" @click="AddNewContact">person_add</v-icon>
+                    <!-- <v-icon color="blue darken-3" @click="AddNewContact">person_add</v-icon> -->
                     <v-spacer></v-spacer>
                     <v-text-field
                         label="Search"
@@ -55,9 +56,17 @@
                     <v-list-tile-action>
                         <v-icon @click="RemoveClient(client.contact_id)" color="red">delete</v-icon>
                     </v-list-tile-action>                                   
-                </v-list-tile>
-                
+                </v-list-tile>    
             </v-list>
+            <v-btn 
+            fab
+            dark
+            style="position: absolute; bottom: 3px" 
+            color="blue darken-3"
+            @click="AddNewContact"
+            >
+            <v-icon>person_add</v-icon>
+            </v-btn>
             </div>
         </v-flex>
         <!-- CONTACT DETAILS DISPLAY SECTION -->

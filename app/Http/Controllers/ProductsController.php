@@ -45,9 +45,36 @@ class ProductsController extends Controller
 
     public function AddProductToCategory(Request $request)
     {
-        $categorised = new CategorisedProducts;
-        $categorised->category_id = $request->data['category_id'];
-        $categorised->product_id = $request->data['product_id'];
-        $categorised->save();
+        $ifCategorisedExists = CategorisedProducts::where('category_id', '=', $request->data['category_id'])
+        ->where('product_id', '=', $request->data['product_id'])->get();
+        if(count($ifCategorisedExists) == 0)
+        {
+            $categorised = new CategorisedProducts;
+            $categorised->category_id = $request->data['category_id'];
+            $categorised->product_id = $request->data['product_id'];
+            $categorised->save();
+            return response('Categorised.', 200)->header('Content-Type', 'text/plain');
+        } 
+        else
+        {
+            return response('Already categorised', 200)->header('Content-Type', 'text/plain');
+        }
+    }
+
+    public function RemoveCategory(Request $request)
+    {
+        $removeCategory = Category::where('category_id', '=', $request->data);
+        $removeCategory->delete();
+    }
+
+    public function RemoveFromCategory(Request $request)
+    {
+        $removeFromCategory = CategorisedProducts::where('category_id', '=', $request->data['category_id'])
+        ->where('product_id', '=', $request->data['product_id']);
+        foreach ($removeFromCategory as $rfc) {
+            $rfc->delete();
+        }
+        $removeFromCategory->delete();
+        unset($rfc);
     }
 }

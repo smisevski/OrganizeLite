@@ -1,24 +1,38 @@
 <template>
     <v-layout>
-        <!-- DATA ITTERATOR FOR PRODUCT DISPLAY PANEL -->
         <v-container fluid class="pa-0">
             <v-toolbar light>
-                <v-toolbar-title class="headline">
+                <v-toolbar-title class="title">
                     <v-icon>label</v-icon>
+                    Products
                 </v-toolbar-title>
-
-                
-                <v-spacer></v-spacer>                    
-                    <v-text-field
-                    label="Search products"
-                    append-icon="search"
-                    style="width: 50px"
-                    >
-                    </v-text-field>
+                <v-spacer></v-spacer>
+                <v-btn 
+                icon
+                @click="advancedSearchDialog = true"
+                >
+                    <v-icon>filter_none</v-icon>
+                </v-btn>
+                <v-btn 
+                icon
+                @click="ClearSearch"
+                :disabled="searchSubstring == '' ? true : false"
+                >
+                    <v-icon>clear</v-icon>
+                </v-btn>
+                <v-text-field
+                label="Search products"
+                append-icon="search"
+                style="width: 50px"
+                v-model="searchSubstring"
+                @keyup.enter="Search"
+                >
+                </v-text-field>
             </v-toolbar>
             <v-layout
             fill-height
             >
+        <!-- DATA ITERATOR FOR PRODUCT DISPLAY PANEL -->
                 <v-container grid-list-md class="pt-1">
                     <v-layout row>
                         <v-flex sm10 md10 lg10>
@@ -85,13 +99,22 @@
                                             <v-icon color="yellow darken-3">star</v-icon>
                                         </v-btn>
                                         <v-btn 
+                                        v-if="categorisedProductsDisplay == false"
                                         icon
-                                        @click="dialog = true"
+                                        @click="SetForCategorisation(props.item.product_id)"
                                         >
                                             <v-icon color="blue darken-3">category</v-icon>
                                         </v-btn>
                                         <v-btn 
+                                        v-else
                                         icon
+                                        @click="RemoveFromCategory(props.item.product_id, categoryFilterCondition.value)"
+                                        >
+                                            <v-icon color="red darken-3">category</v-icon>
+                                        </v-btn>
+                                        <v-btn 
+                                        icon
+                                        @click="AddToSelectedInvoice(props.item)"
                                         >
                                             <v-icon color="green darken-3">all_inclusive</v-icon>
                                         </v-btn>
@@ -106,19 +129,38 @@
             </v-layout>
         </v-container>
 
-    <!-- Manage Category Name Dialog    -->
+    <!-- MANAGE CATEGORY NAME DIALOG -->
     <v-dialog
       v-model="dialog"
-      max-width="290"
+      max-width="350"
     >
       <v-card>
         <v-card-title class="headline">Manage categories</v-card-title>
         <v-card-text>
-            <v-text-field
-            label="Category name"
-            v-model="addCategoryName"
-            >
-            </v-text-field>
+                <v-data-table
+                    hide-actions
+                    hide-headers
+                    :items="menuItems"
+                    class="elevation-1"
+                >
+                    <template v-slot:items="props">
+                    <td class="text-xs-left">{{ props.item.category_name }}</td>
+                    <td class="text-xs-right">
+                        <v-btn icon @click="RemoveCategory(props.item.category_id)">
+                            <v-icon color="red darken-3">cancel</v-icon>
+                        </v-btn>
+                    </td>
+                    </template>
+                </v-data-table>
+                <v-layout align-content-center>
+                    <v-btn 
+                    color="blue darken-3" 
+                    dark 
+                    @click="addCategoryDialog = true"
+                    >
+                    + Add new category
+                    </v-btn>
+                </v-layout>
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
@@ -127,12 +169,75 @@
             flat="flat"
             @click="dialog = false"
           >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- ADD NEW CATEGORY NAME DIALOG -->
+    <v-dialog
+      v-model="addCategoryDialog"
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="headline">Add new category</v-card-title>
+        <v-card-text>
+            <v-text-field 
+            v-model="addCategoryName"
+            label="Category name"
+            >
+            </v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="addCategoryDialog = false"
+          >
             Cancel
           </v-btn>
           <v-btn
             color="blue darken-3"
             flat="flat"
             @click="AddCategory"
+          >
+            Add
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- ADD PRODUCT TO CATEGORY DIALOG  -->
+    <v-dialog
+      v-model="addToCategoryDialog"
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="headline">Add to category</v-card-title>
+        <v-card-text>
+            <v-select 
+            v-model="categorySelected"
+            label="Select category"
+            :items="menuItems"
+            item-text="category_name"
+            item-value="category_id"
+            >
+            </v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="addToCategoryDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="AddProductToCategory(productForCategorisation, categorySelected)"
           >
             Add
           </v-btn>
@@ -168,6 +273,53 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- ADVANCED SEARCH DIALOG -->
+    <v-dialog
+      v-model="advancedSearchDialog"
+      max-width="400"
+    >
+      <v-card>
+        <v-card-title class="headline">Advanced search</v-card-title>
+        <v-card-text>
+            <v-container grid-list-md>
+                <v-layout row>
+                    <v-flex md6>
+                        <v-text-field label="Product description"></v-text-field>
+                    </v-flex>
+                    <v-flex md6>
+                        <v-select label="Product category"></v-select>
+                    </v-flex>
+                </v-layout>
+                <v-layout row>
+                    <v-flex md6>
+                        <v-text-field type="number" label="Minimum price"></v-text-field>
+                    </v-flex>
+                    <v-flex md6>
+                        <v-text-field type="number" label="Maximum price"></v-text-field>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-card-text>
+        <v-card-actions>
+            <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="advancedSearchDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="blue darken-3"
+            flat="flat"
+            @click="Search"
+          >
+          <v-icon>search</v-icon>
+            Search
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     </v-layout>
 </template>
 
@@ -187,6 +339,7 @@ export default {
     data() {
         return {
             products: [],
+            auxilaryProducts: [],
             rowsPerPageItems: [4, 8, 12],
             pagination: {
                 rowsPerPage: 12
@@ -236,7 +389,33 @@ export default {
             ],
             dialog: false,
             productDialog: false,
-            addCategoryName: ''
+            addCategoryDialog: false,
+            advancedSearchDialog: false,
+            addToCategoryDialog: false,
+            addCategoryName: '',
+            manageCategoriesPanel: '',
+            categoriesPanelMode: {
+                listCategories: 'list categories',
+                addCategory: 'add category',
+                editCategory: 'edit category'
+            },
+            editedCategory: {
+                category_id: null,
+                category_name: ''
+            },
+            categorisedProductsDisplay: false,
+            productForCategorisation: 0,
+            categorySelected: 0, 
+            searchSubstring: ''
+        }
+    },
+    watch: {
+        'manageCategoriesPanel': {
+            handler(){
+                if (this.manageCategoriesPanel == this.categoriesPanelMode.listCategories) {
+                    this.GetCategories();   
+                }
+            }
         }
     },
     methods: {
@@ -267,6 +446,11 @@ export default {
                 }
             ).then(res => {
                 this.products = res.data;
+                if(this.categoryFilterCondition.value != 1 
+                && this.categoryFilterCondition.value != 0)
+                    this.categorisedProductsDisplay = true;
+                    else
+                        this.categorisedProductsDisplay = false;
             }).catch(err => {
                 console.error(err);
             });
@@ -304,6 +488,12 @@ export default {
             }).catch(err => {
                 console.error(err);
             });
+            this.addCategoryDialog = false;
+        },
+        SetForCategorisation(product_id)
+        {
+            this.productForCategorisation = product_id;
+            this.addToCategoryDialog = true;
         },
         AddProductToCategory(product_id, category_id)
         {
@@ -318,16 +508,71 @@ export default {
                 }
             ).then(res => {
                 this.dialog = false;
+                this.addToCategoryDialog = false;
                 this.GetCategories();
                 this.GetAllProducts();
             }).catch(err => {
                 console.error(err);
             }); 
+        },
+        RemoveFromCategory(product_id, category_id)
+        {
+            axios.post(
+                'removefromcategory',
+                {
+                    _method: 'DELETE',
+                    withCredentials: true,
+                    data: {
+                        product_id, category_id
+                    }
+                }
+            ).then(res => {
+                console.log('PRODUCT ReMOvED FROM CATEGORY. ')
+                this.FilterProducts();
+            }).catch(err => {
+                console.error(err)
+            });
+        },
+        RemoveCategory(category_id)
+        {
+            axios.post(
+                'removecategory',
+                {
+                    _method: 'DELETE',
+                    withCredentials: true,
+                    data: category_id
+                }
+            ).then(res => {
+                console.log('Category removed. ')
+                this.GetCategories();
+            }).catch(err => {
+                console.error(err)
+            });
+        },
+        Search()
+        {
+            let searchResults = [];
+            this.auxilaryProducts = this.products;
+            for (let i = 0; i < this.products.length; i++) {
+                if(this.products[i].product_description.includes(this.searchSubstring)){
+                    searchResults.push(this.products[i]);
+                }     
+            }
+            this.products = searchResults;
+        },
+        ClearSearch()
+        {
+            this.searchSubstring = '';
+            this.products = this.auxilaryProducts;
+            this.auxilaryProducts = [];
         }
     },
     AddToSelectedInvoice()
     {
 
+    },
+    mounted(){
+        this.manageCategoriesPanel = this.categoriesPanelMode.listCategories;
     },
     created(){
         this.GetAllProducts();

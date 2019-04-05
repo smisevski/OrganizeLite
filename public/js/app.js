@@ -2392,6 +2392,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
@@ -2725,6 +2734,158 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
@@ -2738,6 +2899,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
   data: function data() {
     return {
       products: [],
+      auxilaryProducts: [],
       rowsPerPageItems: [4, 8, 12],
       pagination: {
         rowsPerPage: 12
@@ -2782,8 +2944,34 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
       }],
       dialog: false,
       productDialog: false,
-      addCategoryName: ''
+      addCategoryDialog: false,
+      advancedSearchDialog: false,
+      addToCategoryDialog: false,
+      addCategoryName: '',
+      manageCategoriesPanel: '',
+      categoriesPanelMode: {
+        listCategories: 'list categories',
+        addCategory: 'add category',
+        editCategory: 'edit category'
+      },
+      editedCategory: {
+        category_id: null,
+        category_name: ''
+      },
+      categorisedProductsDisplay: false,
+      productForCategorisation: 0,
+      categorySelected: 0,
+      searchSubstring: ''
     };
+  },
+  watch: {
+    'manageCategoriesPanel': {
+      handler: function handler() {
+        if (this.manageCategoriesPanel == this.categoriesPanelMode.listCategories) {
+          this.GetCategories();
+        }
+      }
+    }
   },
   methods: {
     GetAllProducts: function GetAllProducts() {
@@ -2809,6 +2997,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
         data: this.categoryFilterCondition
       }).then(function (res) {
         _this2.products = res.data;
+        if (_this2.categoryFilterCondition.value != 1 && _this2.categoryFilterCondition.value != 0) _this2.categorisedProductsDisplay = true;else _this2.categorisedProductsDisplay = false;
       }).catch(function (err) {
         console.error(err);
       });
@@ -2845,6 +3034,11 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
       }).catch(function (err) {
         console.error(err);
       });
+      this.addCategoryDialog = false;
+    },
+    SetForCategorisation: function SetForCategorisation(product_id) {
+      this.productForCategorisation = product_id;
+      this.addToCategoryDialog = true;
     },
     AddProductToCategory: function AddProductToCategory(product_id, category_id) {
       var _this5 = this;
@@ -2858,6 +3052,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
         }
       }).then(function (res) {
         _this5.dialog = false;
+        _this5.addToCategoryDialog = false;
 
         _this5.GetCategories();
 
@@ -2865,9 +3060,62 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
       }).catch(function (err) {
         console.error(err);
       });
+    },
+    RemoveFromCategory: function RemoveFromCategory(product_id, category_id) {
+      var _this6 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('removefromcategory', {
+        _method: 'DELETE',
+        withCredentials: true,
+        data: {
+          product_id: product_id,
+          category_id: category_id
+        }
+      }).then(function (res) {
+        console.log('PRODUCT ReMOvED FROM CATEGORY. ');
+
+        _this6.FilterProducts();
+      }).catch(function (err) {
+        console.error(err);
+      });
+    },
+    RemoveCategory: function RemoveCategory(category_id) {
+      var _this7 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('removecategory', {
+        _method: 'DELETE',
+        withCredentials: true,
+        data: category_id
+      }).then(function (res) {
+        console.log('Category removed. ');
+
+        _this7.GetCategories();
+      }).catch(function (err) {
+        console.error(err);
+      });
+    },
+    Search: function Search() {
+      var searchResults = [];
+      this.auxilaryProducts = this.products;
+
+      for (var i = 0; i < this.products.length; i++) {
+        if (this.products[i].product_description.includes(this.searchSubstring)) {
+          searchResults.push(this.products[i]);
+        }
+      }
+
+      this.products = searchResults;
+    },
+    ClearSearch: function ClearSearch() {
+      this.searchSubstring = '';
+      this.products = this.auxilaryProducts;
+      this.auxilaryProducts = [];
     }
   },
   AddToSelectedInvoice: function AddToSelectedInvoice() {},
+  mounted: function mounted() {
+    this.manageCategoriesPanel = this.categoriesPanelMode.listCategories;
+  },
   created: function created() {
     this.GetAllProducts();
     this.GetCategories();
@@ -38596,18 +38844,17 @@ var render = function() {
                 "v-toolbar",
                 { attrs: { light: "" } },
                 [
-                  _c("v-toolbar-title", [_c("v-icon", [_vm._v("group")])], 1),
+                  _c(
+                    "v-toolbar-title",
+                    { staticClass: "title" },
+                    [
+                      _c("v-icon", [_vm._v("group")]),
+                      _vm._v("\n                    Clients\n                ")
+                    ],
+                    1
+                  ),
                   _vm._v(" "),
                   _c("v-spacer"),
-                  _vm._v(" "),
-                  _c(
-                    "v-icon",
-                    {
-                      attrs: { color: "blue darken-3" },
-                      on: { click: _vm.AddNewContact }
-                    },
-                    [_vm._v("person_add")]
-                  ),
                   _vm._v(" "),
                   _c("v-spacer"),
                   _vm._v(" "),
@@ -38710,6 +38957,17 @@ var render = function() {
                     1
                   )
                 }),
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-btn",
+                {
+                  staticStyle: { position: "absolute", bottom: "3px" },
+                  attrs: { fab: "", dark: "", color: "blue darken-3" },
+                  on: { click: _vm.AddNewContact }
+                },
+                [_c("v-icon", [_vm._v("person_add")])],
                 1
               )
             ],
@@ -39862,16 +40120,64 @@ var render = function() {
             [
               _c(
                 "v-toolbar-title",
-                { staticClass: "headline" },
-                [_c("v-icon", [_vm._v("label")])],
+                { staticClass: "title" },
+                [
+                  _c("v-icon", [_vm._v("label")]),
+                  _vm._v("\n                Products\n            ")
+                ],
                 1
               ),
               _vm._v(" "),
               _c("v-spacer"),
               _vm._v(" "),
+              _c(
+                "v-btn",
+                {
+                  attrs: { icon: "" },
+                  on: {
+                    click: function($event) {
+                      _vm.advancedSearchDialog = true
+                    }
+                  }
+                },
+                [_c("v-icon", [_vm._v("filter_none")])],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-btn",
+                {
+                  attrs: {
+                    icon: "",
+                    disabled: _vm.searchSubstring == "" ? true : false
+                  },
+                  on: { click: _vm.ClearSearch }
+                },
+                [_c("v-icon", [_vm._v("clear")])],
+                1
+              ),
+              _vm._v(" "),
               _c("v-text-field", {
                 staticStyle: { width: "50px" },
-                attrs: { label: "Search products", "append-icon": "search" }
+                attrs: { label: "Search products", "append-icon": "search" },
+                on: {
+                  keyup: function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                    ) {
+                      return null
+                    }
+                    return _vm.Search($event)
+                  }
+                },
+                model: {
+                  value: _vm.searchSubstring,
+                  callback: function($$v) {
+                    _vm.searchSubstring = $$v
+                  },
+                  expression: "searchSubstring"
+                }
               })
             ],
             1
@@ -40090,33 +40396,82 @@ var render = function() {
                                                   1
                                                 ),
                                                 _vm._v(" "),
+                                                _vm.categorisedProductsDisplay ==
+                                                false
+                                                  ? _c(
+                                                      "v-btn",
+                                                      {
+                                                        attrs: { icon: "" },
+                                                        on: {
+                                                          click: function(
+                                                            $event
+                                                          ) {
+                                                            return _vm.SetForCategorisation(
+                                                              props.item
+                                                                .product_id
+                                                            )
+                                                          }
+                                                        }
+                                                      },
+                                                      [
+                                                        _c(
+                                                          "v-icon",
+                                                          {
+                                                            attrs: {
+                                                              color:
+                                                                "blue darken-3"
+                                                            }
+                                                          },
+                                                          [_vm._v("category")]
+                                                        )
+                                                      ],
+                                                      1
+                                                    )
+                                                  : _c(
+                                                      "v-btn",
+                                                      {
+                                                        attrs: { icon: "" },
+                                                        on: {
+                                                          click: function(
+                                                            $event
+                                                          ) {
+                                                            return _vm.RemoveFromCategory(
+                                                              props.item
+                                                                .product_id,
+                                                              _vm
+                                                                .categoryFilterCondition
+                                                                .value
+                                                            )
+                                                          }
+                                                        }
+                                                      },
+                                                      [
+                                                        _c(
+                                                          "v-icon",
+                                                          {
+                                                            attrs: {
+                                                              color:
+                                                                "red darken-3"
+                                                            }
+                                                          },
+                                                          [_vm._v("category")]
+                                                        )
+                                                      ],
+                                                      1
+                                                    ),
+                                                _vm._v(" "),
                                                 _c(
                                                   "v-btn",
                                                   {
                                                     attrs: { icon: "" },
                                                     on: {
                                                       click: function($event) {
-                                                        _vm.dialog = true
+                                                        return _vm.AddToSelectedInvoice(
+                                                          props.item
+                                                        )
                                                       }
                                                     }
                                                   },
-                                                  [
-                                                    _c(
-                                                      "v-icon",
-                                                      {
-                                                        attrs: {
-                                                          color: "blue darken-3"
-                                                        }
-                                                      },
-                                                      [_vm._v("category")]
-                                                    )
-                                                  ],
-                                                  1
-                                                ),
-                                                _vm._v(" "),
-                                                _c(
-                                                  "v-btn",
-                                                  { attrs: { icon: "" } },
                                                   [
                                                     _c(
                                                       "v-icon",
@@ -40164,7 +40519,7 @@ var render = function() {
       _c(
         "v-dialog",
         {
-          attrs: { "max-width": "290" },
+          attrs: { "max-width": "350" },
           model: {
             value: _vm.dialog,
             callback: function($$v) {
@@ -40179,6 +40534,133 @@ var render = function() {
             [
               _c("v-card-title", { staticClass: "headline" }, [
                 _vm._v("Manage categories")
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _c("v-data-table", {
+                    staticClass: "elevation-1",
+                    attrs: {
+                      "hide-actions": "",
+                      "hide-headers": "",
+                      items: _vm.menuItems
+                    },
+                    scopedSlots: _vm._u([
+                      {
+                        key: "items",
+                        fn: function(props) {
+                          return [
+                            _c("td", { staticClass: "text-xs-left" }, [
+                              _vm._v(_vm._s(props.item.category_name))
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "td",
+                              { staticClass: "text-xs-right" },
+                              [
+                                _c(
+                                  "v-btn",
+                                  {
+                                    attrs: { icon: "" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.RemoveCategory(
+                                          props.item.category_id
+                                        )
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c(
+                                      "v-icon",
+                                      { attrs: { color: "red darken-3" } },
+                                      [_vm._v("cancel")]
+                                    )
+                                  ],
+                                  1
+                                )
+                              ],
+                              1
+                            )
+                          ]
+                        }
+                      }
+                    ])
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "v-layout",
+                    { attrs: { "align-content-center": "" } },
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "blue darken-3", dark: "" },
+                          on: {
+                            click: function($event) {
+                              _vm.addCategoryDialog = true
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                + Add new category\n                "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          _vm.dialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Close\n      ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "290" },
+          model: {
+            value: _vm.addCategoryDialog,
+            callback: function($$v) {
+              _vm.addCategoryDialog = $$v
+            },
+            expression: "addCategoryDialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", { staticClass: "headline" }, [
+                _vm._v("Add new category")
               ]),
               _vm._v(" "),
               _c(
@@ -40209,7 +40691,7 @@ var render = function() {
                       attrs: { color: "blue darken-3", flat: "flat" },
                       on: {
                         click: function($event) {
-                          _vm.dialog = false
+                          _vm.addCategoryDialog = false
                         }
                       }
                     },
@@ -40221,6 +40703,91 @@ var render = function() {
                     {
                       attrs: { color: "blue darken-3", flat: "flat" },
                       on: { click: _vm.AddCategory }
+                    },
+                    [_vm._v("\n        Add\n      ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "290" },
+          model: {
+            value: _vm.addToCategoryDialog,
+            callback: function($$v) {
+              _vm.addToCategoryDialog = $$v
+            },
+            expression: "addToCategoryDialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", { staticClass: "headline" }, [
+                _vm._v("Add to category")
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _c("v-select", {
+                    attrs: {
+                      label: "Select category",
+                      items: _vm.menuItems,
+                      "item-text": "category_name",
+                      "item-value": "category_id"
+                    },
+                    model: {
+                      value: _vm.categorySelected,
+                      callback: function($$v) {
+                        _vm.categorySelected = $$v
+                      },
+                      expression: "categorySelected"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          _vm.addToCategoryDialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Cancel\n      ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          return _vm.AddProductToCategory(
+                            _vm.productForCategorisation,
+                            _vm.categorySelected
+                          )
+                        }
+                      }
                     },
                     [_vm._v("\n        Add\n      ")]
                   )
@@ -40281,6 +40848,143 @@ var render = function() {
                       on: { click: _vm.AddCategory }
                     },
                     [_vm._v("\n        Add\n      ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "400" },
+          model: {
+            value: _vm.advancedSearchDialog,
+            callback: function($$v) {
+              _vm.advancedSearchDialog = $$v
+            },
+            expression: "advancedSearchDialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", { staticClass: "headline" }, [
+                _vm._v("Advanced search")
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _c(
+                    "v-container",
+                    { attrs: { "grid-list-md": "" } },
+                    [
+                      _c(
+                        "v-layout",
+                        { attrs: { row: "" } },
+                        [
+                          _c(
+                            "v-flex",
+                            { attrs: { md6: "" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: { label: "Product description" }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-flex",
+                            { attrs: { md6: "" } },
+                            [
+                              _c("v-select", {
+                                attrs: { label: "Product category" }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-layout",
+                        { attrs: { row: "" } },
+                        [
+                          _c(
+                            "v-flex",
+                            { attrs: { md6: "" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: {
+                                  type: "number",
+                                  label: "Minimum price"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-flex",
+                            { attrs: { md6: "" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: {
+                                  type: "number",
+                                  label: "Maximum price"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          _vm.advancedSearchDialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Cancel\n      ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: { click: _vm.Search }
+                    },
+                    [
+                      _c("v-icon", [_vm._v("search")]),
+                      _vm._v("\n        Search\n      ")
+                    ],
+                    1
                   )
                 ],
                 1
