@@ -1,7 +1,7 @@
 <template>
     <v-layout fill-height>
         <!-- CONTACTS LIST SECTION -->
-        <v-flex sm4 md4 lg4 xl4 ref="clientList">
+        <v-flex md5 ref="clientList">
             <div
             style="box-shadow: 2px 1px #b7b7b7; height: 100%; background-color: white"
             ref="clientsToolbar">
@@ -16,11 +16,19 @@
                     <v-spacer></v-spacer>
                     <!-- <v-icon color="blue darken-3" @click="AddNewContact">person_add</v-icon> -->
                     <v-spacer></v-spacer>
+                    <v-btn 
+                    :disabled="searchSubstring == '' ? true : false"
+                    icon 
+                    @click="ClearSearch">
+                        <v-icon>clear</v-icon>
+                    </v-btn>
                     <v-text-field
-                        label="Search"
+                        label="Search clients"
                         append-icon="search"
                         regular
                         light
+                        v-model="searchSubstring"
+                        @keyup.enter="Search"
                     ></v-text-field>
                 </v-toolbar> 
             
@@ -51,10 +59,13 @@
                     </v-list-tile-content> 
 
                     <v-list-tile-action>
-                        <v-icon @click="LinkToCurrentInvoice(client)" color="green">share</v-icon>
+                        <v-btn icon @click="LinkToCurrentInvoice(client)">
+                            <v-icon color="green">share</v-icon>
+                        </v-btn>
                     </v-list-tile-action>  
                     <v-list-tile-action>
-                        <v-icon @click="RemoveClient(client.contact_id)" color="red">delete</v-icon>
+                        <v-btn icon @click="RemoveClient(client.contact_id)"></v-btn>
+                        <v-icon color="red">delete</v-icon>
                     </v-list-tile-action>                                   
                 </v-list-tile>    
             </v-list>
@@ -72,7 +83,7 @@
         <!-- CONTACT DETAILS DISPLAY SECTION -->
         <v-flex
         v-if="operationPanel == panelModes.edit" 
-        sm8 md8 lg8 
+        md7 
         ref="ClientDetails" 
         style="max-height: 100vh ;overflow-y: auto"
         > 
@@ -446,6 +457,7 @@ export default {
     data() {
         return {
             clients: [],
+            auxilaryClients: [],
             panelModes: {
                 edit: 'edit',
                 add: 'add'
@@ -456,6 +468,7 @@ export default {
             editMode: false,
             isThumbsSet: false,
             operationPanel: 'edit',
+            searchSubstring: ''
         }
     },
     methods: {
@@ -581,6 +594,24 @@ export default {
             }).catch(err => {
                 console.error(err);
             });   
+        },
+        Search()
+        {
+            let searchResults = [];
+            this.auxilaryClients = this.clients;
+            for (let i = 0; i < this.clients.length; i++) {
+                if(this.clients[i].contact_firstname.includes(this.searchSubstring) 
+                || this.clients[i].contact_firstname.includes(this.searchSubstring)){
+                    searchResults.push(this.clients[i]);
+                }       
+            }
+            this.clients = searchResults;
+        },
+        ClearSearch()
+        {
+            this.searchSubstring = '';
+            this.clients = this.auxilaryClients;
+            this.auxilaryClients = [];
         }
     },
     created() {

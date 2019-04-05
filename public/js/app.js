@@ -2401,6 +2401,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
@@ -2413,6 +2424,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
   data: function data() {
     return {
       clients: [],
+      auxilaryClients: [],
       panelModes: {
         edit: 'edit',
         add: 'add'
@@ -2422,7 +2434,8 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
       a: 0,
       editMode: false,
       isThumbsSet: false,
-      operationPanel: 'edit'
+      operationPanel: 'edit',
+      searchSubstring: ''
     };
   },
   methods: {
@@ -2539,6 +2552,23 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
       }).catch(function (err) {
         console.error(err);
       });
+    },
+    Search: function Search() {
+      var searchResults = [];
+      this.auxilaryClients = this.clients;
+
+      for (var i = 0; i < this.clients.length; i++) {
+        if (this.clients[i].contact_firstname.includes(this.searchSubstring) || this.clients[i].contact_firstname.includes(this.searchSubstring)) {
+          searchResults.push(this.clients[i]);
+        }
+      }
+
+      this.clients = searchResults;
+    },
+    ClearSearch: function ClearSearch() {
+      this.searchSubstring = '';
+      this.clients = this.auxilaryClients;
+      this.auxilaryClients = [];
     }
   },
   created: function created() {
@@ -38825,156 +38855,186 @@ var render = function() {
     "v-layout",
     { attrs: { "fill-height": "" } },
     [
-      _c(
-        "v-flex",
-        { ref: "clientList", attrs: { sm4: "", md4: "", lg4: "", xl4: "" } },
-        [
-          _c(
-            "div",
-            {
-              ref: "clientsToolbar",
-              staticStyle: {
-                "box-shadow": "2px 1px #b7b7b7",
-                height: "100%",
-                "background-color": "white"
-              }
-            },
-            [
-              _c(
-                "v-toolbar",
-                { attrs: { light: "" } },
-                [
-                  _c(
-                    "v-toolbar-title",
-                    { staticClass: "title" },
-                    [
-                      _c("v-icon", [_vm._v("group")]),
-                      _vm._v("\n                    Clients\n                ")
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c("v-spacer"),
-                  _vm._v(" "),
-                  _c("v-spacer"),
-                  _vm._v(" "),
-                  _c("v-text-field", {
+      _c("v-flex", { ref: "clientList", attrs: { md5: "" } }, [
+        _c(
+          "div",
+          {
+            ref: "clientsToolbar",
+            staticStyle: {
+              "box-shadow": "2px 1px #b7b7b7",
+              height: "100%",
+              "background-color": "white"
+            }
+          },
+          [
+            _c(
+              "v-toolbar",
+              { attrs: { light: "" } },
+              [
+                _c(
+                  "v-toolbar-title",
+                  { staticClass: "title" },
+                  [
+                    _c("v-icon", [_vm._v("group")]),
+                    _vm._v("\n                    Clients\n                ")
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c("v-spacer"),
+                _vm._v(" "),
+                _c("v-spacer"),
+                _vm._v(" "),
+                _c(
+                  "v-btn",
+                  {
                     attrs: {
-                      label: "Search",
-                      "append-icon": "search",
-                      regular: "",
-                      light: ""
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-list",
-                {
-                  staticStyle: { "max-height": "100vh", "overflow-y": "auto" }
-                },
-                _vm._l(_vm.clients, function(client) {
-                  return _c(
-                    "v-list-tile",
-                    {
-                      key: client.contact_id,
-                      attrs: { avatar: "", "active-class": "active" },
-                      on: {
-                        click: function($event) {
-                          return _vm.ShowClientsDetails(client.contact_id)
-                        }
-                      }
+                      disabled: _vm.searchSubstring == "" ? true : false,
+                      icon: ""
                     },
-                    [
-                      _c("v-list-tile-avatar", [
-                        _c("img", {
-                          attrs: {
-                            src:
-                              client.contact_id >= 1 && client.contact_id <= 7
-                                ? "images/ci-" + client.contact_id + ".png"
-                                : _vm.CalcThumbs(client.contact_id),
-                            alt: "pic"
+                    on: { click: _vm.ClearSearch }
+                  },
+                  [_c("v-icon", [_vm._v("clear")])],
+                  1
+                ),
+                _vm._v(" "),
+                _c("v-text-field", {
+                  attrs: {
+                    label: "Search clients",
+                    "append-icon": "search",
+                    regular: "",
+                    light: ""
+                  },
+                  on: {
+                    keyup: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      return _vm.Search($event)
+                    }
+                  },
+                  model: {
+                    value: _vm.searchSubstring,
+                    callback: function($$v) {
+                      _vm.searchSubstring = $$v
+                    },
+                    expression: "searchSubstring"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "v-list",
+              { staticStyle: { "max-height": "100vh", "overflow-y": "auto" } },
+              _vm._l(_vm.clients, function(client) {
+                return _c(
+                  "v-list-tile",
+                  {
+                    key: client.contact_id,
+                    attrs: { avatar: "", "active-class": "active" },
+                    on: {
+                      click: function($event) {
+                        return _vm.ShowClientsDetails(client.contact_id)
+                      }
+                    }
+                  },
+                  [
+                    _c("v-list-tile-avatar", [
+                      _c("img", {
+                        attrs: {
+                          src:
+                            client.contact_id >= 1 && client.contact_id <= 7
+                              ? "images/ci-" + client.contact_id + ".png"
+                              : _vm.CalcThumbs(client.contact_id),
+                          alt: "pic"
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "v-list-tile-content",
+                      [
+                        _c("v-list-tile-title", {
+                          domProps: {
+                            textContent: _vm._s(
+                              client.contact_firstname +
+                                " " +
+                                client.contact_lastname
+                            )
                           }
                         })
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "v-list-tile-content",
-                        [
-                          _c("v-list-tile-title", {
-                            domProps: {
-                              textContent: _vm._s(
-                                client.contact_firstname +
-                                  " " +
-                                  client.contact_lastname
-                              )
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-list-tile-action",
+                      [
+                        _c(
+                          "v-btn",
+                          {
+                            attrs: { icon: "" },
+                            on: {
+                              click: function($event) {
+                                return _vm.LinkToCurrentInvoice(client)
+                              }
                             }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-list-tile-action",
-                        [
-                          _c(
-                            "v-icon",
-                            {
-                              attrs: { color: "green" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.LinkToCurrentInvoice(client)
-                                }
-                              }
-                            },
-                            [_vm._v("share")]
-                          )
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-list-tile-action",
-                        [
-                          _c(
-                            "v-icon",
-                            {
-                              attrs: { color: "red" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.RemoveClient(client.contact_id)
-                                }
-                              }
-                            },
-                            [_vm._v("delete")]
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                }),
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  staticStyle: { position: "absolute", bottom: "3px" },
-                  attrs: { fab: "", dark: "", color: "blue darken-3" },
-                  on: { click: _vm.AddNewContact }
-                },
-                [_c("v-icon", [_vm._v("person_add")])],
-                1
-              )
-            ],
-            1
-          )
-        ]
-      ),
+                          },
+                          [
+                            _c("v-icon", { attrs: { color: "green" } }, [
+                              _vm._v("share")
+                            ])
+                          ],
+                          1
+                        )
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-list-tile-action",
+                      [
+                        _c("v-btn", {
+                          attrs: { icon: "" },
+                          on: {
+                            click: function($event) {
+                              return _vm.RemoveClient(client.contact_id)
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("v-icon", { attrs: { color: "red" } }, [
+                          _vm._v("delete")
+                        ])
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                )
+              }),
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "v-btn",
+              {
+                staticStyle: { position: "absolute", bottom: "3px" },
+                attrs: { fab: "", dark: "", color: "blue darken-3" },
+                on: { click: _vm.AddNewContact }
+              },
+              [_c("v-icon", [_vm._v("person_add")])],
+              1
+            )
+          ],
+          1
+        )
+      ]),
       _vm._v(" "),
       _vm.operationPanel == _vm.panelModes.edit
         ? _c(
@@ -38982,7 +39042,7 @@ var render = function() {
             {
               ref: "ClientDetails",
               staticStyle: { "max-height": "100vh", "overflow-y": "auto" },
-              attrs: { sm8: "", md8: "", lg8: "" }
+              attrs: { md7: "" }
             },
             [
               _c(
