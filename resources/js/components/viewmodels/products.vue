@@ -26,6 +26,7 @@
                 style="width: 50px"
                 v-model="searchSubstring"
                 @keyup.enter="Search"
+                @keyup.delete="NarrowSearch"
                 >
                 </v-text-field>
             </v-toolbar>
@@ -551,28 +552,46 @@ export default {
         },
         Search()
         {
-            let searchResults = [];
             this.auxilaryProducts = this.products;
-            for (let i = 0; i < this.products.length; i++) {
-                if(this.products[i].product_description.includes(this.searchSubstring)){
-                    searchResults.push(this.products[i]);
-                }     
+            if(this.searchSubstring != '') {
+                let searchResults = [];
+
+                for (let i = 0; i < this.products.length; i++) {
+                    if(this.products[i].product_description.toUpperCase().includes(this.searchSubstring.toUpperCase())){
+                        searchResults.push(this.products[i]);
+                    }     
+                }
+                this.products = searchResults;
+            } else {
+                this.GetAllProducts();
             }
-            this.products = searchResults;
         },
         ClearSearch()
         {
             this.searchSubstring = '';
             this.products = this.auxilaryProducts;
             this.auxilaryProducts = [];
+        },
+        NarrowSearch()
+        {
+            if(this.searchSubstring != '') {
+                let searchResults = [];
+
+                for (let i = 0; i < this.auxilaryProducts.length; i++) {
+                    if(this.auxilaryProducts[i].product_description.toUpperCase().includes(this.searchSubstring.toUpperCase())){
+                        searchResults.push(this.auxilaryProducts[i]);
+                    }     
+                }
+                this.products = searchResults;
+            } else {
+                this.GetAllProducts();
+            }            
         }
+        
     },
     AddToSelectedInvoice()
     {
 
-    },
-    mounted(){
-        this.manageCategoriesPanel = this.categoriesPanelMode.listCategories;
     },
     created(){
         this.GetAllProducts();

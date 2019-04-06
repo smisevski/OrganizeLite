@@ -29,6 +29,7 @@
                         light
                         v-model="searchSubstring"
                         @keyup.enter="Search"
+                        @keyup.delete="NarrowSearch"
                     ></v-text-field>
                 </v-toolbar> 
             
@@ -64,8 +65,9 @@
                         </v-btn>
                     </v-list-tile-action>  
                     <v-list-tile-action>
-                        <v-btn icon @click="RemoveClient(client.contact_id)"></v-btn>
-                        <v-icon color="red">delete</v-icon>
+                        <v-btn icon @click="RemoveClient(client.contact_id)">
+                            <v-icon color="red">delete</v-icon>
+                        </v-btn>
                     </v-list-tile-action>                                   
                 </v-list-tile>    
             </v-list>
@@ -277,8 +279,23 @@
                     </v-flex>
                 </v-layout>
                 <v-layout justify-end v-if="editMode == true"> 
-                    <v-btn flat justify-end outline color="blue darken-3" @click="CancelEditMode()">Cancel</v-btn>
-                    <v-btn justify-end dark color="blue darken-3" @click="SaveEditedDetails()">Save</v-btn>
+                    <v-btn 
+                    flat 
+                    justify-end 
+                    outline 
+                    color="blue darken-3" 
+                    @click="CancelEditMode()"
+                    >
+                    Cancel
+                    </v-btn>
+                    <v-btn 
+                    justify-end 
+                    dark 
+                    color="blue darken-3" 
+                    @click="SaveEditedDetails()"
+                    >
+                    Save
+                    </v-btn>
                 </v-layout>
                 </div>
             </v-container>      
@@ -597,21 +614,40 @@ export default {
         },
         Search()
         {
-            let searchResults = [];
             this.auxilaryClients = this.clients;
-            for (let i = 0; i < this.clients.length; i++) {
-                if(this.clients[i].contact_firstname.includes(this.searchSubstring) 
-                || this.clients[i].contact_firstname.includes(this.searchSubstring)){
-                    searchResults.push(this.clients[i]);
-                }       
+            if(this.searchSubstring != '') {
+                let searchResults = [];
+                for (let i = 0; i < this.clients.length; i++) {
+                    if(this.clients[i].contact_firstname.toUpperCase().includes(this.searchSubstring.toUpperCase()) 
+                    || this.clients[i].contact_lastname.toUpperCase().includes(this.searchSubstring.toUpperCase())){
+                        searchResults.push(this.clients[i]);
+                    }       
+                }
+                this.clients = searchResults;
+            } else {
+                this.GetAllClients();
             }
-            this.clients = searchResults;
         },
         ClearSearch()
         {
             this.searchSubstring = '';
             this.clients = this.auxilaryClients;
             this.auxilaryClients = [];
+        },
+        NarrowSearch()
+        {
+            if(this.searchSubstring != '') {
+                let searchResults = [];
+                for (let i = 0; i < this.auxilaryClients.length; i++) {
+                    if(this.auxilaryClients[i].contact_firstname.toUpperCase().includes(this.searchSubstring.toUpperCase()) 
+                    || this.auxilaryClients[i].contact_lastname.toUpperCase().includes(this.searchSubstring.toUpperCase())){
+                        searchResults.push(this.auxilaryClients[i]);
+                    }       
+                }
+                this.clients = searchResults;
+            } else {
+                this.GetAllClients();
+            }
         }
     },
     created() {

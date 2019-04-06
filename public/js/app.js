@@ -2412,6 +2412,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
@@ -2554,21 +2571,41 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
       });
     },
     Search: function Search() {
-      var searchResults = [];
       this.auxilaryClients = this.clients;
 
-      for (var i = 0; i < this.clients.length; i++) {
-        if (this.clients[i].contact_firstname.includes(this.searchSubstring) || this.clients[i].contact_firstname.includes(this.searchSubstring)) {
-          searchResults.push(this.clients[i]);
-        }
-      }
+      if (this.searchSubstring != '') {
+        var searchResults = [];
 
-      this.clients = searchResults;
+        for (var i = 0; i < this.clients.length; i++) {
+          if (this.clients[i].contact_firstname.toUpperCase().includes(this.searchSubstring.toUpperCase()) || this.clients[i].contact_lastname.toUpperCase().includes(this.searchSubstring.toUpperCase())) {
+            searchResults.push(this.clients[i]);
+          }
+        }
+
+        this.clients = searchResults;
+      } else {
+        this.GetAllClients();
+      }
     },
     ClearSearch: function ClearSearch() {
       this.searchSubstring = '';
       this.clients = this.auxilaryClients;
       this.auxilaryClients = [];
+    },
+    NarrowSearch: function NarrowSearch() {
+      if (this.searchSubstring != '') {
+        var searchResults = [];
+
+        for (var i = 0; i < this.auxilaryClients.length; i++) {
+          if (this.auxilaryClients[i].contact_firstname.toUpperCase().includes(this.searchSubstring.toUpperCase()) || this.auxilaryClients[i].contact_lastname.toUpperCase().includes(this.searchSubstring.toUpperCase())) {
+            searchResults.push(this.auxilaryClients[i]);
+          }
+        }
+
+        this.clients = searchResults;
+      } else {
+        this.GetAllClients();
+      }
     }
   },
   created: function created() {
@@ -2591,6 +2628,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _models_product_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_models_product_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
+//
 //
 //
 //
@@ -3125,27 +3163,44 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
       });
     },
     Search: function Search() {
-      var searchResults = [];
       this.auxilaryProducts = this.products;
 
-      for (var i = 0; i < this.products.length; i++) {
-        if (this.products[i].product_description.includes(this.searchSubstring)) {
-          searchResults.push(this.products[i]);
-        }
-      }
+      if (this.searchSubstring != '') {
+        var searchResults = [];
 
-      this.products = searchResults;
+        for (var i = 0; i < this.products.length; i++) {
+          if (this.products[i].product_description.toUpperCase().includes(this.searchSubstring.toUpperCase())) {
+            searchResults.push(this.products[i]);
+          }
+        }
+
+        this.products = searchResults;
+      } else {
+        this.GetAllProducts();
+      }
     },
     ClearSearch: function ClearSearch() {
       this.searchSubstring = '';
       this.products = this.auxilaryProducts;
       this.auxilaryProducts = [];
+    },
+    NarrowSearch: function NarrowSearch() {
+      if (this.searchSubstring != '') {
+        var searchResults = [];
+
+        for (var i = 0; i < this.auxilaryProducts.length; i++) {
+          if (this.auxilaryProducts[i].product_description.toUpperCase().includes(this.searchSubstring.toUpperCase())) {
+            searchResults.push(this.auxilaryProducts[i]);
+          }
+        }
+
+        this.products = searchResults;
+      } else {
+        this.GetAllProducts();
+      }
     }
   },
   AddToSelectedInvoice: function AddToSelectedInvoice() {},
-  mounted: function mounted() {
-    this.manageCategoriesPanel = this.categoriesPanelMode.listCategories;
-  },
   created: function created() {
     this.GetAllProducts();
     this.GetCategories();
@@ -38906,15 +38961,38 @@ var render = function() {
                     light: ""
                   },
                   on: {
-                    keyup: function($event) {
-                      if (
-                        !$event.type.indexOf("key") &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
+                    keyup: [
+                      function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        return _vm.Search($event)
+                      },
+                      function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "delete",
+                            [8, 46],
+                            $event.key,
+                            ["Backspace", "Delete", "Del"]
+                          )
+                        ) {
+                          return null
+                        }
+                        return _vm.NarrowSearch($event)
                       }
-                      return _vm.Search($event)
-                    }
+                    ]
                   },
                   model: {
                     value: _vm.searchSubstring,
@@ -38999,18 +39077,23 @@ var render = function() {
                     _c(
                       "v-list-tile-action",
                       [
-                        _c("v-btn", {
-                          attrs: { icon: "" },
-                          on: {
-                            click: function($event) {
-                              return _vm.RemoveClient(client.contact_id)
+                        _c(
+                          "v-btn",
+                          {
+                            attrs: { icon: "" },
+                            on: {
+                              click: function($event) {
+                                return _vm.RemoveClient(client.contact_id)
+                              }
                             }
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("v-icon", { attrs: { color: "red" } }, [
-                          _vm._v("delete")
-                        ])
+                          },
+                          [
+                            _c("v-icon", { attrs: { color: "red" } }, [
+                              _vm._v("delete")
+                            ])
+                          ],
+                          1
+                        )
                       ],
                       1
                     )
@@ -39658,7 +39741,11 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v("Cancel")]
+                                [
+                                  _vm._v(
+                                    "\n                Cancel\n                "
+                                  )
+                                ]
                               ),
                               _vm._v(" "),
                               _c(
@@ -39675,7 +39762,11 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v("Save")]
+                                [
+                                  _vm._v(
+                                    "\n                Save\n                "
+                                  )
+                                ]
                               )
                             ],
                             1
@@ -40221,15 +40312,30 @@ var render = function() {
                 staticStyle: { width: "50px" },
                 attrs: { label: "Search products", "append-icon": "search" },
                 on: {
-                  keyup: function($event) {
-                    if (
-                      !$event.type.indexOf("key") &&
-                      _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                    ) {
-                      return null
+                  keyup: [
+                    function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      return _vm.Search($event)
+                    },
+                    function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "delete", [8, 46], $event.key, [
+                          "Backspace",
+                          "Delete",
+                          "Del"
+                        ])
+                      ) {
+                        return null
+                      }
+                      return _vm.NarrowSearch($event)
                     }
-                    return _vm.Search($event)
-                  }
+                  ]
                 },
                 model: {
                   value: _vm.searchSubstring,
