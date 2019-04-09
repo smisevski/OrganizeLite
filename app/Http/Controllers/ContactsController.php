@@ -42,7 +42,7 @@ class ContactsController extends Controller
         $updateContactAddress->update(['zip_code' => $request->data['contact_zip_code']]);
 
         $updateContactCompany = ContactCompany::where('contact_id', '=',$request->data['contact_id']); 
-        $updateContactAddress->update(['contact_company_name' => $request->data['contact_company_name']]);
+        $updateContactCompany->update(['contact_company_name' => $request->data['contact_company_name']]);
         $updateContactCompany->update(['contact_company_address' => $request->data['contact_company_address']]);
         $updateContactCompany->update(['contact_company_email' => $request->data['contact_company_email']]);
         $updateContactCompany->update(['contact_company_phone' => $request->data['contact_company_phone']]);

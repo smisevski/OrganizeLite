@@ -18,6 +18,8 @@ Vue.component('navigation-drawer', require('./components/navigation-drawer.vue')
 /** VIEWMODELS */
 Vue.component('clients', require('./components/viewmodels/clients.vue').default);
 Vue.component('products', require('./components/viewmodels/products.vue').default);
+Vue.component('invoices', require('./components/viewmodels/invoices.vue').default);
+Vue.component('invoices-create', require('./components/viewmodels/invoices-create.vue').default);
 
 window.csrf_token = "{{ csrf_token() }}"
 /**

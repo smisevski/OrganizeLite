@@ -64,7 +64,7 @@
           { title: 'Dashboard', icon: 'dashboard' },
           { title: 'Clients', icon: 'group', panel: 'clients' },
           { title: 'Products', icon: 'label', panel: 'products' },
-          { title: 'Invoices', icon: 'receipt' },
+          { title: 'Invoices', icon: 'receipt', panel: 'invoices' },
           { title: 'Projects', icon: 'markunread_mailbox' },
           { title: 'Settings', icon: 'settings' },
         ],

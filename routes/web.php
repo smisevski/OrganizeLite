@@ -41,6 +41,8 @@ Route::delete('/removecategory', 'ProductsController@RemoveCategory');
 
 Route::delete('/removefromcategory', 'ProductsController@RemoveFromCategory');
 
+Route::get('/getinvoices', 'InvoiceController@GetAllInvoices');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
