@@ -87,10 +87,11 @@
                 </v-container>
             </v-layout>
         </v-container>
-        <v-container v-if="viewMode == 'singleInvoiceView'">
-            <component 
+        <v-container class="pa-0" v-if="viewMode == 'singleInvoiceView'">
+            <component
             :is="dynamicPanel.component"
             :invoice="dynamicPanel.props"
+            @cancel-create-invoice="viewMode = 'invoicesPanelView'"
             ></component>
         </v-container>
     <!-- ADVANCED SEARCH DIALOG  -->
@@ -150,7 +151,7 @@ import axios from 'axios';
 const csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-TOKEN': window.csrf_token
+    'X-CSRF-TOKEN': csrfToken
 };
 axios.defaults.withCredentials = true;
 export default {
@@ -188,8 +189,6 @@ export default {
             })
         },
         OpenInvoiceCreate(){
-            let newInvoice = new Invoice;
-            this.dynamicPanel.props = newInvoice;
             this.dynamicPanel.component = 'invoices-create';
             this.viewMode = 'singleInvoiceView';
         },

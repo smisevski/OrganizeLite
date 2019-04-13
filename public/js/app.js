@@ -2435,7 +2435,7 @@ __webpack_require__.r(__webpack_exports__);
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
   'X-Requested-With': 'XMLHttpRequest',
-  'X-CSRF-TOKEN': window.csrf_token
+  'X-CSRF-TOKEN': csrfToken
 };
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "clients",
@@ -2627,6 +2627,158 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _models_invoice_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../models/invoice.js */ "./resources/js/models/invoice.js");
+/* harmony import */ var _models_product_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../models/product.js */ "./resources/js/models/product.js");
+/* harmony import */ var _functions_calculations_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../functions/calculations.js */ "./resources/js/functions/calculations.js");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2642,10 +2794,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
+
+
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.headers.common = {
   'X-Requested-With': 'XMLHttpRequest',
-  'X-CSRF-TOKEN': window.csrf_token
+  'X-CSRF-TOKEN': csrfToken
 };
 axios__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.withCredentials = true;
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2653,8 +2808,170 @@ axios__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.withCredentials = true;
   props: ['invoice'],
   data: function data() {
     return {
-      invoiceProducts: []
+      newInvoice: {},
+      products: [],
+      clients: [],
+      invoiceProducts: [],
+      headers: [{
+        text: 'Product code',
+        align: 'left',
+        value: 'code'
+      }, {
+        text: 'Product description',
+        value: 'description',
+        align: 'left'
+      }, {
+        text: 'Quantity',
+        value: 'quantity',
+        align: 'left'
+      }, {
+        text: 'Unit price',
+        value: 'unitprice',
+        align: 'left'
+      }, {
+        text: 'Amount',
+        value: 'amount',
+        align: 'left'
+      }, {
+        text: 'Options',
+        value: 'options',
+        align: 'left'
+      }],
+      auxilaryProduct: {},
+      auxilaryProducts: [],
+      auxilaryClients: [],
+      addQuantityDialog: false,
+      productSearchSubstring: '',
+      clientSearchSubstring: '',
+      productQuantity: 1,
+      categoryFilterCondition: {
+        field: 'category_id',
+        operator: '=',
+        value: 0
+      }
     };
+  },
+  watch: {
+    "newInvoice.invoice_items": {
+      handler: function handler() {
+        this.CalculateTotalInvoice();
+      }
+    }
+  },
+  methods: {
+    GetAllProducts: function GetAllProducts() {
+      var _this = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('getproducts', {
+        _method: 'GET',
+        withCredentials: true
+      }).then(function (res) {
+        console.log('RESPONZ PRODUKTZ: ', res.data);
+        _this.products = res.data;
+      }).catch(function (err) {
+        console.error(err);
+      });
+    },
+    GetAllClients: function GetAllClients() {
+      var _this2 = this;
+
+      this.clients = [];
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('getcontacts').then(function (response) {
+        _this2.clients = response.data;
+        console.log('Klienti ', response.data);
+      }).catch(function (err) {
+        console.error(err);
+      });
+    },
+    SearchProducts: function SearchProducts() {
+      this.auxilaryProducts = this.products;
+
+      if (this.productSearchSubstring != '') {
+        var searchResults = [];
+
+        for (var i = 0; i < this.products.length; i++) {
+          if (this.products[i].product_description.toUpperCase().includes(this.productSearchSubstring.toUpperCase())) {
+            searchResults.push(this.products[i]);
+          }
+        }
+
+        this.products = searchResults;
+      } else {
+        this.GetAllProducts();
+      }
+    },
+    NarrowSearchProducts: function NarrowSearchProducts() {
+      if (this.productSearchSubstring != '') {
+        var searchResults = [];
+
+        for (var i = 0; i < this.auxilaryProducts.length; i++) {
+          if (this.auxilaryProducts[i].product_description.toUpperCase().includes(this.productSearchSubstring.toUpperCase())) {
+            searchResults.push(this.auxilaryProducts[i]);
+          }
+        }
+
+        this.products = searchResults;
+      } else {
+        this.GetAllProducts();
+      }
+    },
+    SearchClients: function SearchClients() {
+      this.auxilaryClients = this.clients;
+
+      if (this.clientSearchSubstring != '') {
+        var searchResults = [];
+
+        for (var i = 0; i < this.clients.length; i++) {
+          if (this.clients[i].contact_firstname.toUpperCase().includes(this.clientSearchSubstring.toUpperCase()) || this.clients[i].contact_lastname.toUpperCase().includes(this.clientSearchSubstring.toUpperCase())) {
+            searchResults.push(this.clients[i]);
+          }
+        }
+
+        this.clients = searchResults;
+      } else {
+        this.GetAllClients();
+      }
+    },
+    NarrowSearchClients: function NarrowSearchClients() {// PREPISHI LOGIKA ZA NARROWSEARCH, GLEJ DA PREKRATISH NE NATRUPUVAJ LOGIKA
+    },
+    AddClientToInvoice: function AddClientToInvoice(client) {
+      this.newInvoice.invoice_client.id = client.contact_id;
+      this.newInvoice.invoice_client.name = client.contact_firstname + ' ' + client.contact_lastname;
+      this.newInvoice.invoice_client.address = client.street + ', ' + client.city + ', ' + client.country;
+      this.newInvoice.invoice_client.phone = client.contact_phone;
+      this.newInvoice.invoice_client.email = client.email;
+      this.clientSearchSubstring = '';
+      console.log(this.newInvoice.invoice_client);
+    },
+    OpenAddQuantityDialog: function OpenAddQuantityDialog(product) {
+      this.auxilaryProduct = product;
+      this.addQuantityDialog = true;
+    },
+    AddProductToInvoice: function AddProductToInvoice() {
+      var invoiceProduct = new _models_product_js__WEBPACK_IMPORTED_MODULE_2__["default"]();
+      invoiceProduct.product_id = this.auxilaryProduct.product_id;
+      invoiceProduct.product_code = this.auxilaryProduct.product_code;
+      invoiceProduct.product_description = this.auxilaryProduct.product_description;
+      invoiceProduct.product_barcode = this.auxilaryProduct.product_barcode;
+      invoiceProduct.product_status = this.auxilaryProduct.product_status;
+      invoiceProduct.product_unitprice = this.auxilaryProduct.product_unitprice;
+      invoiceProduct.product_vat_rate = 18.0;
+      invoiceProduct.product_quantity = this.productQuantity;
+      invoiceProduct.product_total_price = _functions_calculations_js__WEBPACK_IMPORTED_MODULE_3__["Calculations"].CalculateItemTotals(invoiceProduct.product_unitprice, invoiceProduct.product_quantity);
+      this.newInvoice.invoice_items.push(invoiceProduct);
+      this.productSearchSubstring = '';
+      this.productQuantity = 1;
+      this.auxilaryProduct = {};
+      this.addQuantityDialog = false;
+    },
+    CalculateTotalInvoice: function CalculateTotalInvoice() {
+      this.newInvoice.invoice_total_price = _functions_calculations_js__WEBPACK_IMPORTED_MODULE_3__["Calculations"].CalculateInvoiceTotals(this.newInvoice);
+    }
+  },
+  created: function created() {
+    this.GetAllProducts();
+    this.GetAllClients();
+    this.newInvoice = new _models_invoice_js__WEBPACK_IMPORTED_MODULE_1__["default"]();
   }
 });
 
@@ -2817,12 +3134,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
   'X-Requested-With': 'XMLHttpRequest',
-  'X-CSRF-TOKEN': window.csrf_token
+  'X-CSRF-TOKEN': csrfToken
 };
 axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2858,8 +3176,6 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
       });
     },
     OpenInvoiceCreate: function OpenInvoiceCreate() {
-      var newInvoice = new _models_invoice_js__WEBPACK_IMPORTED_MODULE_0__["default"]();
-      this.dynamicPanel.props = newInvoice;
       this.dynamicPanel.component = 'invoices-create';
       this.viewMode = 'singleInvoiceView';
     },
@@ -2884,7 +3200,6 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _models_product_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../models/product.js */ "./resources/js/models/product.js");
-/* harmony import */ var _models_product_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_models_product_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
 //
@@ -3218,7 +3533,7 @@ __webpack_require__.r(__webpack_exports__);
 var csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.headers.common = {
   'X-Requested-With': 'XMLHttpRequest',
-  'X-CSRF-TOKEN': window.csrf_token
+  'X-CSRF-TOKEN': csrfToken
 };
 axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -3317,7 +3632,6 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.withCredentials = true;
     FilterProducts: function FilterProducts() {
       var _this2 = this;
 
-      console.log('category id', this.categoryFilterCondition.value);
       axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('getconditionalproducts', {
         _method: 'POST',
         withCredentials: true,
@@ -40519,20 +40833,521 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "v-layout",
-    { staticStyle: { height: "100vh" } },
     [
       _c(
-        "v-layout",
-        { attrs: { row: "" } },
+        "v-container",
+        {
+          staticClass: "pa-0",
+          staticStyle: { "max-height": "100vh", "overflow-y": "auto" },
+          attrs: { fluid: "" }
+        },
         [
           _c(
-            "v-list-tile",
+            "v-toolbar",
             [
-              _c("v-list-tile-content", { staticClass: "title" }, [
-                _vm._v(
-                  "\n                    Create new invoice\n                "
-                )
-              ])
+              _c(
+                "v-toolbar-title",
+                { staticClass: "title" },
+                [
+                  _c("v-icon", [_vm._v("receipt")]),
+                  _vm._v("\n                Create new invoice\n            ")
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-spacer"),
+              _vm._v(" "),
+              _c(
+                "v-btn",
+                {
+                  attrs: { icon: "" },
+                  on: {
+                    click: function($event) {
+                      return _vm.$emit("cancel-create-invoice")
+                    }
+                  }
+                },
+                [_c("v-icon", [_vm._v("clear")])],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-layout",
+            [
+              _c(
+                "v-container",
+                { attrs: { "grid-list-md": "" } },
+                [
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "" } },
+                    [
+                      _c(
+                        "v-flex",
+                        { attrs: { md6: "" } },
+                        [
+                          _c("v-subheader", [
+                            _vm._v(
+                              "\n                            Invoice sender info\n                        "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("v-divider"),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Company name" }
+                          }),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Company address" }
+                          }),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Company phone" }
+                          }),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Company email" }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        {
+                          staticStyle: {
+                            "overflow-y": "visible",
+                            position: "relative"
+                          },
+                          attrs: { md6: "" }
+                        },
+                        [
+                          _c("v-subheader", [
+                            _vm._v(
+                              "\n                            Invoice reciever info\n                        "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("v-divider"),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            staticClass: "hide-textfield-details",
+                            attrs: { label: "Client name" },
+                            on: { keypress: _vm.SearchClients },
+                            model: {
+                              value: _vm.clientSearchSubstring,
+                              callback: function($$v) {
+                                _vm.clientSearchSubstring = $$v
+                              },
+                              expression: "clientSearchSubstring"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.clientSearchSubstring != ""
+                            ? _c(
+                                "div",
+                                {
+                                  staticClass: "container-fluid pa-0",
+                                  staticStyle: {
+                                    background: "white",
+                                    position: "absolute",
+                                    "z-index": "9",
+                                    "max-height": "300px",
+                                    "overflow-y": "auto"
+                                  }
+                                },
+                                [
+                                  _c(
+                                    "v-list",
+                                    { staticClass: "mt-0" },
+                                    _vm._l(_vm.clients, function(client) {
+                                      return _c(
+                                        "v-list-tile",
+                                        {
+                                          key: client.contact_id,
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.AddClientToInvoice(
+                                                client
+                                              )
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("v-list-tile-title", [
+                                            _vm._v(
+                                              "\n                                        " +
+                                                _vm._s(
+                                                  client.contact_firstname +
+                                                    " " +
+                                                    client.contact_lastname
+                                                ) +
+                                                "\n                                    "
+                                            )
+                                          ])
+                                        ],
+                                        1
+                                      )
+                                    }),
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Client address" },
+                            model: {
+                              value: _vm.newInvoice.invoice_client.address,
+                              callback: function($$v) {
+                                _vm.$set(
+                                  _vm.newInvoice.invoice_client,
+                                  "address",
+                                  $$v
+                                )
+                              },
+                              expression: "newInvoice.invoice_client.address"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Client phone" },
+                            model: {
+                              value: _vm.newInvoice.invoice_client.phone,
+                              callback: function($$v) {
+                                _vm.$set(
+                                  _vm.newInvoice.invoice_client,
+                                  "phone",
+                                  $$v
+                                )
+                              },
+                              expression: "newInvoice.invoice_client.phone"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            attrs: { label: "Client email" },
+                            model: {
+                              value: _vm.newInvoice.invoice_client.email,
+                              callback: function($$v) {
+                                _vm.$set(
+                                  _vm.newInvoice.invoice_client,
+                                  "email",
+                                  $$v
+                                )
+                              },
+                              expression: "newInvoice.invoice_client.email"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-layout",
+                    { staticStyle: { "backgroud-color": "white!important" } },
+                    [
+                      _c(
+                        "v-flex",
+                        {
+                          staticStyle: {
+                            "overflow-y": "visible",
+                            position: "relative"
+                          },
+                          attrs: { md10: "" }
+                        },
+                        [
+                          _c("v-text-field", {
+                            staticClass: "hide-textfield-details",
+                            attrs: { label: "Search products" },
+                            on: { keypress: _vm.SearchProducts },
+                            model: {
+                              value: _vm.productSearchSubstring,
+                              callback: function($$v) {
+                                _vm.productSearchSubstring = $$v
+                              },
+                              expression: "productSearchSubstring"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.productSearchSubstring != ""
+                            ? _c(
+                                "div",
+                                {
+                                  staticClass: "container-fluid pa-0",
+                                  staticStyle: {
+                                    background: "white",
+                                    position: "absolute",
+                                    "z-index": "9",
+                                    "max-height": "300px",
+                                    "overflow-y": "auto"
+                                  }
+                                },
+                                [
+                                  _c(
+                                    "v-list",
+                                    { staticClass: "mt-0" },
+                                    _vm._l(_vm.products, function(product) {
+                                      return _c(
+                                        "v-list-tile",
+                                        {
+                                          key: product.product_id,
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.OpenAddQuantityDialog(
+                                                product
+                                              )
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("v-list-tile-title", [
+                                            _vm._v(
+                                              "\n                                        " +
+                                                _vm._s(
+                                                  product.product_description
+                                                ) +
+                                                "\n                                    "
+                                            )
+                                          ])
+                                        ],
+                                        1
+                                      )
+                                    }),
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            : _vm._e()
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-flex",
+                        { attrs: { md2: "" } },
+                        [
+                          _c(
+                            "v-btn",
+                            { attrs: { color: "blue darken-3", dark: "" } },
+                            [
+                              _vm._v(
+                                "\n                            + Apply discounts\n                        "
+                              )
+                            ]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("v-data-table", {
+                    attrs: {
+                      headers: _vm.headers,
+                      items: _vm.newInvoice.invoice_items,
+                      "hide-actions": ""
+                    },
+                    scopedSlots: _vm._u([
+                      {
+                        key: "items",
+                        fn: function(props) {
+                          return [
+                            _c("td", { staticClass: "text-xs-left" }, [
+                              _vm._v(_vm._s(props.item.product_code))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", { staticClass: "text-xs-left" }, [
+                              _vm._v(_vm._s(props.item.product_description))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", { staticClass: "text-xs-left" }, [
+                              _vm._v(_vm._s(props.item.product_quantity))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", { staticClass: "text-xs-left" }, [
+                              _vm._v(_vm._s(props.item.product_unitprice))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", { staticClass: "text-xs-left" }, [
+                              _vm._v(_vm._s(props.item.product_total_price))
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "td",
+                              { staticClass: "text-xs-left" },
+                              [
+                                _c(
+                                  "v-btn",
+                                  { attrs: { icon: "" } },
+                                  [
+                                    _c(
+                                      "v-icon",
+                                      { attrs: { color: "red darken-3" } },
+                                      [_vm._v("remove")]
+                                    )
+                                  ],
+                                  1
+                                )
+                              ],
+                              1
+                            )
+                          ]
+                        }
+                      }
+                    ])
+                  }),
+                  _vm._v(" "),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "" } },
+                    [
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "title" }, [
+                        _vm._v("Total price:")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "title ml-4" }, [
+                        _vm._v(_vm._s(_vm.newInvoice.invoice_total_price))
+                      ])
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c(
+                    "v-layout",
+                    { attrs: { row: "", "justify-end": "" } },
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { flat: "", color: "blue darken-3" },
+                          on: {
+                            click: function($event) {
+                              return _vm.$emit("cancel-create-invoice")
+                            }
+                          }
+                        },
+                        [_vm._v("Cancel")]
+                      ),
+                      _vm._v(" "),
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        { attrs: { outline: "", color: "blue darken-3" } },
+                        [_vm._v("Save as draft")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        { attrs: { dark: "", color: "blue darken-3" } },
+                        [_vm._v("Save")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "400" },
+          model: {
+            value: _vm.addQuantityDialog,
+            callback: function($$v) {
+              _vm.addQuantityDialog = $$v
+            },
+            expression: "addQuantityDialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", { staticClass: "headline" }, [
+                _vm._v("Add product quantity")
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _c(
+                    "v-layout",
+                    [
+                      _c("v-text-field", {
+                        attrs: { type: "number", label: "Product quantity" },
+                        model: {
+                          value: _vm.productQuantity,
+                          callback: function($$v) {
+                            _vm.productQuantity = $$v
+                          },
+                          expression: "productQuantity"
+                        }
+                      })
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          _vm.addQuantityDialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Cancel\n      ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-3", flat: "flat" },
+                      on: {
+                        click: function($event) {
+                          return _vm.AddProductToInvoice()
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Add\n      ")]
+                  )
+                ],
+                1
+              )
             ],
             1
           )
@@ -40838,10 +41653,16 @@ var render = function() {
       _vm.viewMode == "singleInvoiceView"
         ? _c(
             "v-container",
+            { staticClass: "pa-0" },
             [
               _c(_vm.dynamicPanel.component, {
                 tag: "component",
-                attrs: { invoice: _vm.dynamicPanel.props }
+                attrs: { invoice: _vm.dynamicPanel.props },
+                on: {
+                  "cancel-create-invoice": function($event) {
+                    _vm.viewMode = "invoicesPanelView"
+                  }
+                }
               })
             ],
             1
@@ -77508,6 +78329,53 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/functions/calculations.js":
+/*!************************************************!*\
+  !*** ./resources/js/functions/calculations.js ***!
+  \************************************************/
+/*! exports provided: Calculations */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Calculations", function() { return Calculations; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Calculations =
+/*#__PURE__*/
+function () {
+  function Calculations() {
+    _classCallCheck(this, Calculations);
+  }
+
+  _createClass(Calculations, null, [{
+    key: "CalculateItemTotals",
+    value: function CalculateItemTotals(unitprice, quantity) {
+      var itemTotal = unitprice * quantity;
+      return itemTotal;
+    }
+  }, {
+    key: "CalculateInvoiceTotals",
+    value: function CalculateInvoiceTotals(invoice) {
+      var invoiceTotal = 0;
+
+      for (var i = 0; i < invoice.invoice_items.length; i++) {
+        invoiceTotal += invoice.invoice_items[i].product_unitprice * invoice.invoice_items[i].product_quantity;
+      }
+
+      return invoiceTotal;
+    }
+  }]);
+
+  return Calculations;
+}();
+
+/***/ }),
+
 /***/ "./resources/js/models/contact.js":
 /*!****************************************!*\
   !*** ./resources/js/models/contact.js ***!
@@ -77545,7 +78413,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var _default = function _default() {
   _classCallCheck(this, _default);
 
-  this.invoice_id = null, this.invoice_name = '', this.invoice_client = '', this.invoice_sender = '', this.invoice_issued = '', this.invoice_items = [], this.invoice_total_price = 0.0, this.invoce_total_discount = 0.0;
+  this.invoice_id = null, this.invoice_name = '', this.invoice_client = {
+    id: 0,
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    fax: ''
+  }, this.invoice_sender = '', this.invoice_issued = '', this.invoice_items = [], this.invoice_total_price = 0.0, this.invoce_total_discount = 0.0;
 };
 
 
@@ -77556,8 +78431,19 @@ var _default = function _default() {
 /*!****************************************!*\
   !*** ./resources/js/models/product.js ***!
   \****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _default; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _default = function _default() {
+  _classCallCheck(this, _default);
+
+  this.product_id = 0, this.product_code = '', this.product_description = '', this.product_code = '', this.product_barcode = '', this.product_status = '', this.product_unitprice = 0.0, this.product_quantity = 0, this.product_vat_rate = 0.0, this.product_total_price = 0.0;
+};
 
 
 

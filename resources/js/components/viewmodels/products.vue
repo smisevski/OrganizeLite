@@ -331,7 +331,7 @@ import axios from 'axios';
 const csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-TOKEN': window.csrf_token
+    'X-CSRF-TOKEN': csrfToken
 };
 axios.defaults.withCredentials = true;
 
@@ -437,7 +437,6 @@ export default {
         },
         FilterProducts()
         {
-            console.log('category id', this.categoryFilterCondition.value)
             axios.post(
                 'getconditionalproducts',
                 {

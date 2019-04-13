@@ -111,7 +111,7 @@
                 <v-list-tile-avatar>
                         <img 
                         :src="(displayContact.contact_id >=1 
-                        && displayContact.contact_id <=7) ? `images/ci-${displayContact.contact_id}.png` 
+                        && displayContact.contact_id <= 7) ? `images/ci-${displayContact.contact_id}.png` 
                         : CalcThumbs(displayContact.contact_id)" 
                         alt="pic">
                 </v-list-tile-avatar>
@@ -466,7 +466,7 @@ import axios from 'axios';
 const csrfToken = document.querySelector("meta[name=csrf-token]").content;
 axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-TOKEN': window.csrf_token
+    'X-CSRF-TOKEN': csrfToken
 };
 
 export default {
